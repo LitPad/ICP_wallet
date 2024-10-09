@@ -1,11 +1,16 @@
 {
-  "canisters": {
+"canisters": {
     "wallet": {
       "candid": "wallet/can.did",
       "package": "wallet",
       "type": "custom",
       "wasm": "target/wasm32-unknown-unknown/release/wallet.wasm",
-      "build": "./generate-wasm.sh wallet"
+      "build": "./generate-wasm.sh wallet",
+      "metadata": [
+        {
+          "name": "candid:service"
+        }
+      ]
     }
   },
   "defaults": {

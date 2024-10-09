@@ -7,3 +7,7 @@ edition = "2021"
 ic-cdk = "^0.16.0"
 ic-cdk-macros = "^0.16.0"
 candid = "0.10"
+serde = "^1.0.210"
+
+[lib]
+crate-type = ["cdylib"]
