@@ -1,15 +1,28 @@
+mod env;
+mod types;
 use candid::CandidType;
+use env::{CanisterEnvironment, EmptyEnvironment, Environment};
 use ic_cdk_macros::*;
 use serde::Deserialize;
 use std::cell::RefCell;
+use types::TimestampMillis;
 
 thread_local! {
     static RUNTIME_STATE: RefCell<RuntimeState> = RefCell::default();
 }
 
-#[derive(Default)]
 struct RuntimeState {
+    env: Box<dyn Environment>,
     data: Data,
+}
+
+impl Default for RuntimeState {
+    fn default() -> Self {
+        RuntimeState {
+            env: Box::new(EmptyEnvironment {}),
+            data: Data::default(),
+        }
+    }
 }
 
 #[derive(CandidType, Deserialize, Default)]
@@ -22,6 +35,15 @@ struct TodoItem {
     id: u32,
     done: bool,
     name: String,
+    date_added: TimestampMillis,
+}
+
+#[init]
+fn init() {
+    let env = Box::new(CanisterEnvironment::new());
+    let data = Data::default();
+    let runtime_state = RuntimeState { env, data };
+    RUNTIME_STATE.with(|state| *state.borrow_mut() = runtime_state);
 }
 
 #[pre_upgrade]
@@ -37,7 +59,8 @@ fn pre_upgrade() {
 fn post_upgrade() {
     match ic_cdk::storage::stable_restore::<(Data,)>() {
         Ok((data,)) => {
-            let runtime_state = RuntimeState { data };
+            let env = Box::new(CanisterEnvironment::new());
+            let runtime_state = RuntimeState { env, data };
             RUNTIME_STATE.with(|state| *state.borrow_mut() = runtime_state);
         }
         Err(e) => {
@@ -58,8 +81,9 @@ fn add_impl(name: String, runtime_state: &mut RuntimeState) -> u32 {
 
     runtime_state.data.todos.push(TodoItem {
         id,
-        done: false,
         name,
+        done: false,
+        date_added: runtime_state.env.now(),
     });
 
     id
@@ -72,4 +96,35 @@ fn get() -> Vec<TodoItem> {
 
 fn get_impl(runtime_state: &RuntimeState) -> Vec<TodoItem> {
     runtime_state.data.todos.clone()
+}
+
+#[cfg(test)]
+mod tests {
+    use env::TestEnvironment;
+
+    use super::*;
+
+    #[test]
+    fn add_then_get() {
+        let mut runtime_state = RuntimeState {
+            env: Box::new(TestEnvironment { now: 1 }),
+            data: Data::default(),
+        };
+
+        let name = "abcd".to_string();
+
+        let id = add_impl(name.clone(), &mut runtime_state);
+
+        ic_cdk::println!("ID: {:?}", id.clone());
+
+        let results = get_impl(&runtime_state);
+
+        assert_eq!(results.len(), 1);
+
+        let result = results.first().unwrap();
+
+        assert_eq!(result.name, name);
+        assert_eq!(result.date_added, 1);
+        assert!(!result.done);
+    }
 }
