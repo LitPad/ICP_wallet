@@ -1,0 +1,5 @@
+service: {
+    add: (text) -> (nat32);
+    get: () -> (vec text) query;
+    mark_done: (nat32) -> bool;
+}
