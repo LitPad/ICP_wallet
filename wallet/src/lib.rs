@@ -30,7 +30,7 @@ struct Data {
     wallet: Vec<Wallet>,
 }
 
-#[derive(CandidType, Deserialize, Clone)]
+#[derive(CandidType, Deserialize, Clone, Debug)]
 struct Transaction {
     from: String,
     to: String,
@@ -39,7 +39,7 @@ struct Transaction {
     created_at: TimestampMillis,
 }
 
-#[derive(CandidType, Deserialize, Clone)]
+#[derive(CandidType, Deserialize, Clone, Debug)]
 struct Wallet {
     user_id: String,
     balance: u64,
@@ -82,8 +82,8 @@ fn post_upgrade() {
 }
 
 #[update]
-fn create_wallet(name: String) -> Wallet {
-    RUNTIME_STATE.with(|state| create_wallet_impl(name, &mut state.borrow_mut()))
+fn create_wallet(user_id: String) -> Wallet {
+    RUNTIME_STATE.with(|state| create_wallet_impl(user_id, &mut state.borrow_mut()))
 }
 
 fn create_wallet_impl(user_id: String, runtime_state: &mut RuntimeState) -> Wallet {
@@ -194,33 +194,34 @@ fn fund_wallet_impl(
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-//     use env::TestEnvironment;
+#[cfg(test)]
+mod tests {
+    use env::TestEnvironment;
 
-//     use super::*;
+    use super::*;
 
-//     #[test]
-//     fn add_then_get() {
-//         let mut runtime_state = RuntimeState {
-//             env: Box::new(TestEnvironment { now: 1 }),
-//             data: Data::default(),
-//         };
+    #[test]
+    fn create_then_get() {
+        let mut runtime_state = RuntimeState {
+            env: Box::new(TestEnvironment { now: 1 }),
+            data: Data::default(),
+        };
 
-//         let name = "abcd".to_string();
+        let user_id = "abcd".to_string();
 
-//         let id = add_impl(name.clone(), &mut runtime_state);
+        let wallet = create_wallet_impl(user_id.clone(), &mut runtime_state);
 
-//         ic_cdk::println!("ID: {:?}", id.clone());
+        assert_eq!(wallet.balance, 1);
+        assert_eq!(wallet.user_id, user_id.clone());
 
-//         let results = get_impl(&runtime_state);
+        ic_cdk::println!("Wallet: {:?}", wallet.clone());
 
-//         assert_eq!(results.len(), 1);
+        let results = get_wallet_impl(user_id.clone(), &mut runtime_state);
 
-//         let result = results.first().unwrap();
+        assert_eq!(results.len(), 1);
 
-//         assert_eq!(result.name, name);
-//         assert_eq!(result.date_added, 1);
-//         assert!(!result.done);
-//     }
-// }
+        let result = results.first().unwrap();
+
+        assert_eq!(result.user_id, user_id.clone());
+    }
+}
