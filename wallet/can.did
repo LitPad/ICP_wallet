@@ -18,7 +18,7 @@ type Transaction =
 
 service: {
     create_wallet: (text) -> (Wallet);
-    fund_wallet: (nat64) -> (bool);
+    fund_wallet: (text, nat64) -> (nat64, Transaction);
     get_balance: (text) -> (nat64) query;
     make_payment: (text, nat64) -> (bool);
     get_transaction_history: (text) -> (vec Transaction) query;

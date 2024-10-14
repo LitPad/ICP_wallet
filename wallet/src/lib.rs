@@ -88,7 +88,7 @@ fn create_wallet(name: String) -> Wallet {
 
 fn create_wallet_impl(user_id: String, runtime_state: &mut RuntimeState) -> Wallet {
     // Check if the user already has a wallet
-    let existing_wallets = get_wallet_impl(user_id.clone(), runtime_state);
+    let existing_wallets: Vec<Wallet> = get_wallet_impl(user_id.clone(), runtime_state);
 
     if !existing_wallets.is_empty() {
         // User already has a wallet
@@ -145,6 +145,53 @@ fn get_balance_impl(user_id: String, runtime_state: &RuntimeState) -> u64 {
 
     let balance = wallet[0].clone().balance;
     balance
+}
+
+#[update]
+fn fund_wallet(user_id: String, amount: u64) -> (u64, Transaction) {
+    RUNTIME_STATE.with(|state| fund_wallet_impl(user_id, amount, &mut state.borrow_mut()))
+}
+
+fn fund_wallet_impl(
+    user_id: String,
+    amount: u64,
+    runtime_state: &mut RuntimeState,
+) -> (u64, Transaction) {
+    let funded_wallet = runtime_state
+        .data
+        .wallet
+        .iter_mut()
+        .find(|wallet| wallet.user_id == user_id);
+
+    if let Some(funded_wallet) = funded_wallet {
+        funded_wallet.balance += amount;
+
+        let transaction = Transaction {
+            from: "funding".to_string(),
+            to: funded_wallet.user_id.clone(),
+            amount,
+            narration: "Wallet has been funded".to_string(),
+            created_at: runtime_state.env.now(),
+        };
+
+        funded_wallet.updated_at = runtime_state.env.now();
+
+        funded_wallet.transaction.push(transaction.clone());
+
+        return (funded_wallet.balance.clone(), transaction.clone());
+    } else {
+        ic_cdk::println!("Wallet not found");
+        return (
+            0,
+            Transaction {
+                amount: 0,
+                created_at: 0,
+                from: "".to_string(),
+                narration: "".to_string(),
+                to: "".to_string(),
+            },
+        );
+    }
 }
 
 // #[cfg(test)]
