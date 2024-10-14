@@ -27,15 +27,25 @@ impl Default for RuntimeState {
 
 #[derive(CandidType, Deserialize, Default)]
 struct Data {
-    todos: Vec<TodoItem>,
+    wallet: Vec<Wallet>,
 }
 
 #[derive(CandidType, Deserialize, Clone)]
-struct TodoItem {
-    id: u32,
-    done: bool,
-    name: String,
-    date_added: TimestampMillis,
+struct Transaction {
+    from: String,
+    to: String,
+    amount: u64,
+    narration: String,
+    created_at: TimestampMillis,
+}
+
+#[derive(CandidType, Deserialize, Clone)]
+struct Wallet {
+    user_id: String,
+    balance: u64,
+    transaction: Vec<Transaction>,
+    created_at: TimestampMillis,
+    updated_at: TimestampMillis,
 }
 
 #[init]
@@ -72,59 +82,79 @@ fn post_upgrade() {
 }
 
 #[update]
-fn add(name: String) -> u32 {
-    RUNTIME_STATE.with(|state| add_impl(name, &mut state.borrow_mut()))
+fn create_wallet(name: String) -> Wallet {
+    RUNTIME_STATE.with(|state| create_wallet_impl(name, &mut state.borrow_mut()))
 }
 
-fn add_impl(name: String, runtime_state: &mut RuntimeState) -> u32 {
-    let id = runtime_state.data.todos.len() as u32;
+fn create_wallet_impl(user_id: String, runtime_state: &mut RuntimeState) -> Wallet {
+    // Check if the user already has a wallet
+    let existing_wallets = get_wallet_impl(user_id.clone(), runtime_state);
 
-    runtime_state.data.todos.push(TodoItem {
-        id,
-        name,
-        done: false,
-        date_added: runtime_state.env.now(),
-    });
+    if !existing_wallets.is_empty() {
+        // User already has a wallet
+        ic_cdk::println!("Failed to create wallet: user already has a wallet");
+        return existing_wallets[0].clone();
+    }
 
-    id
+    // If the user doesn't have a wallet, create a new one
+    let new_wallet = Wallet {
+        user_id: user_id.clone(),
+        balance: 0,
+        transaction: vec![],
+        created_at: runtime_state.env.now(),
+        updated_at: runtime_state.env.now(),
+    };
+
+    runtime_state.data.wallet.push(new_wallet.clone());
+
+    // Return the newly created wallet
+    new_wallet
 }
 
 #[query]
-fn get() -> Vec<TodoItem> {
-    RUNTIME_STATE.with(|state| get_impl(&state.borrow_mut()))
+fn get_wallet(user_id: String) -> Vec<Wallet> {
+    RUNTIME_STATE.with(|state| get_wallet_impl(user_id, &state.borrow_mut()))
 }
 
-fn get_impl(runtime_state: &RuntimeState) -> Vec<TodoItem> {
-    runtime_state.data.todos.clone()
+fn get_wallet_impl(user_id: String, runtime_state: &RuntimeState) -> Vec<Wallet> {
+    let wallets: Vec<Wallet> = runtime_state
+        .data
+        .wallet
+        .iter()
+        .filter(|wallet| wallet.user_id == user_id)
+        .cloned()
+        .collect();
+
+    wallets
 }
 
-#[cfg(test)]
-mod tests {
-    use env::TestEnvironment;
+// #[cfg(test)]
+// mod tests {
+//     use env::TestEnvironment;
 
-    use super::*;
+//     use super::*;
 
-    #[test]
-    fn add_then_get() {
-        let mut runtime_state = RuntimeState {
-            env: Box::new(TestEnvironment { now: 1 }),
-            data: Data::default(),
-        };
+//     #[test]
+//     fn add_then_get() {
+//         let mut runtime_state = RuntimeState {
+//             env: Box::new(TestEnvironment { now: 1 }),
+//             data: Data::default(),
+//         };
 
-        let name = "abcd".to_string();
+//         let name = "abcd".to_string();
 
-        let id = add_impl(name.clone(), &mut runtime_state);
+//         let id = add_impl(name.clone(), &mut runtime_state);
 
-        ic_cdk::println!("ID: {:?}", id.clone());
+//         ic_cdk::println!("ID: {:?}", id.clone());
 
-        let results = get_impl(&runtime_state);
+//         let results = get_impl(&runtime_state);
 
-        assert_eq!(results.len(), 1);
+//         assert_eq!(results.len(), 1);
 
-        let result = results.first().unwrap();
+//         let result = results.first().unwrap();
 
-        assert_eq!(result.name, name);
-        assert_eq!(result.date_added, 1);
-        assert!(!result.done);
-    }
-}
+//         assert_eq!(result.name, name);
+//         assert_eq!(result.date_added, 1);
+//         assert!(!result.done);
+//     }
+// }
