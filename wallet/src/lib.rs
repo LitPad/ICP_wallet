@@ -92,14 +92,14 @@ fn create_wallet_impl(user_id: String, runtime_state: &mut RuntimeState) -> Wall
 
     if !existing_wallets.is_empty() {
         // User already has a wallet
-        ic_cdk::println!("Failed to create wallet: user already has a wallet");
+        ic_cdk::println!("Failed to create wallet: user already has a wallet.");
         return existing_wallets[0].clone();
     }
 
     // If the user doesn't have a wallet, create a new one
     let new_wallet = Wallet {
         user_id: user_id.clone(),
-        balance: 0,
+        balance: 1,
         transaction: vec![],
         created_at: runtime_state.env.now(),
         updated_at: runtime_state.env.now(),
@@ -126,6 +126,25 @@ fn get_wallet_impl(user_id: String, runtime_state: &RuntimeState) -> Vec<Wallet>
         .collect();
 
     wallets
+}
+
+#[query]
+fn get_balance(user_id: String) -> u64 {
+    RUNTIME_STATE.with(|state| get_balance_impl(user_id, &state.borrow_mut()))
+}
+
+fn get_balance_impl(user_id: String, runtime_state: &RuntimeState) -> u64 {
+    let wallet: Vec<Wallet> = get_wallet_impl(user_id.clone(), runtime_state);
+
+    if wallet.is_empty() {
+        ic_cdk::println!(
+            "Cannot fetch wallet balance because wallet does not exist for this user!"
+        );
+        return 0;
+    }
+
+    let balance = wallet[0].clone().balance;
+    balance
 }
 
 // #[cfg(test)]
