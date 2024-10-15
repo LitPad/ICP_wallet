@@ -3,6 +3,7 @@ type Wallet =
     user_id: text;
     balance: nat64;
     transaction: vec Transaction;
+    address: text;
     created_at: nat64;
     updated_at: nat64;
 };
@@ -24,4 +25,8 @@ service: {
     get_transaction_history: (text) -> (vec Transaction) query;
     withdraw: (nat64) -> (bool);
     get_wallet: (text) -> (vec Wallet) query;
+
+    // Interacting with the ICP itself
+    check_icp_balance: (text) -> (nat64);
+    transfer_icp: (text, text, nat64) -> (bool);
 }

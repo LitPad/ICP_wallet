@@ -9,6 +9,10 @@ ic-cdk-macros = "^0.16.0"
 candid = "0.10"
 serde = "^1.0.210"
 chrono = "0.4.38"
+sha2 = "0.10.8"
+ic-ledger-types = "0.13.0"
+ic_principal = "0.1.1"
+hex = "0.4.3"
 
 [lib]
 crate-type = ["cdylib"]

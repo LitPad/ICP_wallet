@@ -1,11 +1,15 @@
 mod env;
 mod types;
+mod utils;
 use candid::CandidType;
 use env::{CanisterEnvironment, EmptyEnvironment, Environment};
 use ic_cdk_macros::*;
+use ic_ledger_types::{AccountIdentifier, Tokens};
+use ic_principal::Principal;
 use serde::Deserialize;
 use std::cell::RefCell;
 use types::TimestampMillis;
+use utils::{check_balance, generate_account_identifier};
 
 thread_local! {
     static RUNTIME_STATE: RefCell<RuntimeState> = RefCell::default();
@@ -44,6 +48,7 @@ struct Wallet {
     user_id: String,
     balance: u64,
     transaction: Vec<Transaction>,
+    address: String,
     created_at: TimestampMillis,
     updated_at: TimestampMillis,
 }
@@ -90,17 +95,27 @@ fn create_wallet_impl(user_id: String, runtime_state: &mut RuntimeState) -> Wall
     // Check if the user already has a wallet
     let existing_wallets: Vec<Wallet> = get_wallet_impl(user_id.clone(), runtime_state);
 
+    let canister_id = Principal::from_text("bd3sg-teaaa-aaaaa-qaaba-cai").unwrap();
+
     if !existing_wallets.is_empty() {
         // User already has a wallet
         ic_cdk::println!("Failed to create wallet: user already has a wallet.");
         return existing_wallets[0].clone();
-    }
+    };
 
+    let subaccount = generate_account_identifier(user_id.clone(), canister_id);
+
+    ic_cdk::println!("sub account address: {}", subaccount);
+
+    let subaccount_address = subaccount.to_string();
+
+    // let subaccount  = utils
     // If the user doesn't have a wallet, create a new one
     let new_wallet = Wallet {
         user_id: user_id.clone(),
         balance: 1,
         transaction: vec![],
+        address: subaccount_address,
         created_at: runtime_state.env.now(),
         updated_at: runtime_state.env.now(),
     };
@@ -192,6 +207,18 @@ fn fund_wallet_impl(
             },
         );
     }
+}
+
+// e8fc6af5a6b9be901ab5fea3f6936ee60c3f30128a04c1ff6c7de584b9992b65
+
+#[update]
+async fn check_icp_balance(account: String) -> Result<Tokens, String> {
+    let result = RUNTIME_STATE.with(|_state| check_balance(account)).await?;
+
+    ic_cdk::println!("BALANCE: {:?}", result);
+
+    result.e8s();
+    return Ok(result);
 }
 
 #[cfg(test)]

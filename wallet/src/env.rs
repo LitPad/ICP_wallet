@@ -34,7 +34,7 @@ impl EmptyEnvironment {
 
 impl Environment for EmptyEnvironment {
     fn now(&self) -> u64 {
-        unimplemented!()
+        0
     }
 
     // fn caller(&self) -> Principal {

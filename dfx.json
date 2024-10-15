@@ -11,6 +11,12 @@
           "name": "candid:service"
         }
       ]
+    },
+    "ledger": {
+      "type": "custom",
+      "candid": "/Users/unknown/nns-ifaces/ledger.did",
+      "wasm": "/Users/unknown/ic/rs/rosetta-api/ledger_canister/wasm/ledger-canister.wasm",
+      "build": ""
     }
   },
   "defaults": {
