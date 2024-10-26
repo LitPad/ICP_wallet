@@ -1,106 +1,15 @@
 {
   "canisters": {
-    "ledger": {
-      "build": "",
-      "candid": "/Users/unknown/nns-ifaces/ledger.did",
+    "icp_ledger_canister": {
+      "candid": "icp_ledger.did",
       "type": "custom",
-      "wasm": "/Users/unknown/ic/rs/rosetta-api/ledger_canister/wasm/ledger-canister.wasm"
-    },
-    "nns-cycles-minting": {
-      "build": "",
-      "candid": "candid/nns-cycles-minting.did",
+      "wasm": "icp_ledger.wasm.gz",
       "remote": {
         "id": {
-          "ic": "rkp4c-7iaaa-aaaaa-aaaca-cai",
-          "local": "rkp4c-7iaaa-aaaaa-aaaca-cai"
+          "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
         }
       },
-      "type": "custom",
-      "wasm": ""
-    },
-    "nns-genesis-token": {
-      "build": "",
-      "candid": "candid/nns-genesis-token.did",
-      "remote": {
-        "id": {
-          "ic": "renrk-eyaaa-aaaaa-aaada-cai",
-          "local": "renrk-eyaaa-aaaaa-aaada-cai"
-        }
-      },
-      "type": "custom",
-      "wasm": ""
-    },
-    "nns-governance": {
-      "build": "",
-      "candid": "candid/nns-governance.did",
-      "remote": {
-        "id": {
-          "ic": "rrkah-fqaaa-aaaaa-aaaaq-cai",
-          "local": "rrkah-fqaaa-aaaaa-aaaaq-cai"
-        }
-      },
-      "type": "custom",
-      "wasm": ""
-    },
-    "nns-ledger": {
-      "build": "",
-      "candid": "candid/nns-ledger.did",
-      "remote": {
-        "id": {
-          "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai",
-          "local": "ryjl3-tyaaa-aaaaa-aaaba-cai"
-        }
-      },
-      "type": "custom",
-      "wasm": ""
-    },
-    "nns-lifeline": {
-      "build": "",
-      "candid": "candid/nns-lifeline.did",
-      "remote": {
-        "id": {
-          "ic": "rno2w-sqaaa-aaaaa-aaacq-cai",
-          "local": "rno2w-sqaaa-aaaaa-aaacq-cai"
-        }
-      },
-      "type": "custom",
-      "wasm": ""
-    },
-    "nns-registry": {
-      "build": "",
-      "candid": "candid/nns-registry.did",
-      "remote": {
-        "id": {
-          "ic": "rwlgt-iiaaa-aaaaa-aaaaa-cai",
-          "local": "rwlgt-iiaaa-aaaaa-aaaaa-cai"
-        }
-      },
-      "type": "custom",
-      "wasm": ""
-    },
-    "nns-root": {
-      "build": "",
-      "candid": "candid/nns-root.did",
-      "remote": {
-        "id": {
-          "ic": "r7inp-6aaaa-aaaaa-aaabq-cai",
-          "local": "r7inp-6aaaa-aaaaa-aaabq-cai"
-        }
-      },
-      "type": "custom",
-      "wasm": ""
-    },
-    "nns-sns-wasm": {
-      "build": "",
-      "candid": "candid/nns-sns-wasm.did",
-      "remote": {
-        "id": {
-          "ic": "qaa6y-5yaaa-aaaaa-aaafa-cai",
-          "local": "qaa6y-5yaaa-aaaaa-aaafa-cai"
-        }
-      },
-      "type": "custom",
-      "wasm": ""
+      "init_arg": "(variant { Init = record { minting_account = \"13f313beb13d449568ac98eb989f74b61463f7c4edb69be1b8b5d1e1044fe71a\"; initial_values = vec { record { \"04208a95eb03b4d668859e0fc62c98cf059c0db0c1cffbe62ed5c0f3e942ff6a\"; record { e8s = 10_000_000_000 : nat64; }; }; }; send_whitelist = vec {}; transfer_fee = opt record { e8s = 10_000 : nat64; }; token_symbol = opt \"LICP\"; token_name = opt \"Local ICP\"; } })"
     },
     "wallet": {
       "build": "./generate-wasm.sh wallet",

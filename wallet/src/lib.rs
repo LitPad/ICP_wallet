@@ -221,6 +221,9 @@ async fn check_icp_balance(account: String) -> Result<Tokens, String> {
     return Ok(result);
 }
 
+// account id - 13f313beb13d449568ac98eb989f74b61463f7c4edb69be1b8b5d1e1044fe71a
+
+// efault account id - 04208a95eb03b4d668859e0fc62c98cf059c0db0c1cffbe62ed5c0f3e942ff6a
 #[cfg(test)]
 mod tests {
     use env::TestEnvironment;
