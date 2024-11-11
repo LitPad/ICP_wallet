@@ -9,7 +9,7 @@ use ic_principal::Principal;
 use serde::Deserialize;
 use std::cell::RefCell;
 use types::TimestampMillis;
-use utils::{check_balance, generate_account_identifier};
+use utils::{check_balance, generate_account_identifier, transfer};
 
 thread_local! {
     static RUNTIME_STATE: RefCell<RuntimeState> = RefCell::default();
@@ -221,7 +221,27 @@ async fn check_icp_balance(account: String) -> Result<Tokens, String> {
     return Ok(result);
 }
 
+#[update]
+async fn transfer_icp(
+    from_account: String,
+    to_account: String,
+    amount: u64,
+) -> Result<bool, String> {
+    let to_account_identifier = AccountIdentifier::from_hex(&to_account)
+        .map_err(|_| "Invalid to_account format".to_string())?;
+
+    let transfer_result = transfer(to_account_identifier, amount).await;
+
+    match transfer_result {
+        Ok(_) => Ok(true),
+        Err(e) => Err(e),
+    }
+}
+
 // account id - 13f313beb13d449568ac98eb989f74b61463f7c4edb69be1b8b5d1e1044fe71a
+
+// ledger_id = bkyz2-fmaaa-aaaaa-qaaaq-cai
+// wallet_id =
 
 // efault account id - 04208a95eb03b4d668859e0fc62c98cf059c0db0c1cffbe62ed5c0f3e942ff6a
 #[cfg(test)]

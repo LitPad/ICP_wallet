@@ -4,7 +4,8 @@ use ic_ledger_types::{
 };
 use ic_principal::Principal;
 
-const ICP_LEDGER_CANISTER_ID: &str = "ryjl3-tyaaa-aaaaa-aaaba-cai";
+// const ICP_LEDGER_CANISTER_ID: &str = "ryjl3-tyaaa-aaaaa-aaaba-cai";
+const ICP_LEDGER_CANISTER_ID: &str = "bkyz2-fmaaa-aaaaa-qaaaq-cai";
 
 fn extract_subaccount(account_id: AccountIdentifier) -> Option<Subaccount> {
     None

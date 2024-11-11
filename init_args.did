@@ -1,0 +1,30 @@
+(variant { Init = record { 
+    minting_account = record { 
+        owner = principal "acp34-7hekg-tlis6-rpdep-sxhtg-nvcqk-3d2hq-nll2f-4d2pk-xvf2p-tqe"; 
+        subaccount = opt blob "13f313beb13d449568ac98eb989f74b61463f7c4edb69be1b8b5d1e1044fe71a" 
+    }; 
+    initial_balances = vec { 
+        record { 
+            record { 
+                owner = principal "ms725-4x546-spyjs-zqu7o-4ghiv-zh6zj-gnk3s-oects-u5qhl-en7so-gqe"; 
+                subaccount = opt blob "04208a95eb03b4d668859e0fc62c98cf059c0db0c1cffbe62ed5c0f3e942ff6a" 
+            }; 
+            10_000_000_000 : nat 
+        }; 
+    }; 
+    send_whitelist = vec {}; 
+    transfer_fee = 10_000 : nat; 
+    token_symbol = "LICP"; 
+    token_name = "Local ICP"; 
+    metadata = vec {}; 
+    archive_options = record {
+        num_blocks_to_archive = 1000 : nat64;
+        max_transactions_per_response = opt null;
+        trigger_threshold = 2000 : nat64;
+        max_message_size_bytes = opt null;
+        cycles_for_archive_creation = opt null;
+        node_max_memory_size_bytes = opt null;
+        controller_id = principal "ms725-4x546-spyjs-zqu7o-4ghiv-zh6zj-gnk3s-oects-u5qhl-en7so-gqe"; 
+        more_controller_ids = opt vec {}
+    }; 
+}})

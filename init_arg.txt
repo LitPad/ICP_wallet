@@ -1,0 +1,31 @@
+(
+  variant {
+    Init = record {
+      send_whitelist = vec {
+        principal "ms725-4x546-spyjs-zqu7o-4ghiv-zh6zj-gnk3s-oects-u5qhl-en7so-gqe";
+        principal "lh5he-yaatz-u5hrt-ys5ti-kqi74-jhkum-dxahj-c6ijw-2uans-wgznx-jae";
+      };
+      token_symbol = opt "\"ICP\"";
+      transfer_fee = null;
+      minting_account = "04208a95eb03b4d668859e0fc62c98cf059c0db0c1cffbe62ed5c0f3e942ff6a";
+      maximum_number_of_accounts = null;
+      accounts_overflow_trim_quantity = null;
+      transaction_window = null;
+      max_message_size_bytes = null;
+      icrc1_minting_account = null;
+      archive_options = null;
+      initial_values = vec {
+        record {
+          "04208a95eb03b4d668859e0fc62c98cf059c0db0c1cffbe62ed5c0f3e942ff6a";
+          record { e8s = 100_000_000 : nat64 };
+        };
+        record {
+          "13f313beb13d449568ac98eb989f74b61463f7c4edb69be1b8b5d1e1044fe71a";
+          record { e8s = 100_000_000 : nat64 };
+        };
+      };
+      token_name = null;
+      feature_flags = null;
+    }
+  },
+)

@@ -1,15 +1,14 @@
 {
   "canisters": {
     "icp_ledger_canister": {
-      "candid": "icp_ledger.did",
+      "candid": "https://raw.githubusercontent.com/dfinity/ic/aba60ffbc46acfc8990bf4d5685c1360bd7026b9/rs/ledger_suite/icp/ledger.did",
       "type": "custom",
-      "wasm": "icp_ledger.wasm.gz",
+      "wasm": "https://download.dfinity.systems/ic/aba60ffbc46acfc8990bf4d5685c1360bd7026b9/canisters/ledger-canister.wasm.gz",
       "remote": {
         "id": {
           "ic": "ryjl3-tyaaa-aaaaa-aaaba-cai"
         }
-      },
-      "init_arg": "(variant { Init = record { minting_account = \"13f313beb13d449568ac98eb989f74b61463f7c4edb69be1b8b5d1e1044fe71a\"; initial_values = vec { record { \"04208a95eb03b4d668859e0fc62c98cf059c0db0c1cffbe62ed5c0f3e942ff6a\"; record { e8s = 10_000_000_000 : nat64; }; }; }; send_whitelist = vec {}; transfer_fee = opt record { e8s = 10_000 : nat64; }; token_symbol = opt \"LICP\"; token_name = opt \"Local ICP\"; } })"
+      }
     },
     "wallet": {
       "build": "./generate-wasm.sh wallet",
