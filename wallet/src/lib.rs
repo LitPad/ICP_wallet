@@ -9,7 +9,9 @@ use ic_principal::Principal;
 use serde::Deserialize;
 use std::cell::RefCell;
 use types::TimestampMillis;
-use utils::{check_balance, generate_account_identifier, transfer};
+use utils::{
+    check_balance, generate_account_identifier, transfer, BalanceResponse, TransferResponse,
+};
 
 thread_local! {
     static RUNTIME_STATE: RefCell<RuntimeState> = RefCell::default();
@@ -211,14 +213,9 @@ fn fund_wallet_impl(
 
 // e8fc6af5a6b9be901ab5fea3f6936ee60c3f30128a04c1ff6c7de584b9992b65
 
-#[update]
-async fn check_icp_balance(account: String) -> Result<Tokens, String> {
-    let result = RUNTIME_STATE.with(|_state| check_balance(account)).await?;
-
-    ic_cdk::println!("BALANCE: {:?}", result);
-
-    result.e8s();
-    return Ok(result);
+#[query]
+async fn check_icp_balance(account: String) -> utils::Result<BalanceResponse> {
+    RUNTIME_STATE.with(|_state| check_balance(account)).await
 }
 
 #[update]
@@ -226,24 +223,25 @@ async fn transfer_icp(
     from_account: String,
     to_account: String,
     amount: u64,
-) -> Result<bool, String> {
+) -> utils::Result<TransferResponse> {
     let to_account_identifier = AccountIdentifier::from_hex(&to_account)
         .map_err(|_| "Invalid to_account format".to_string())?;
 
-    let transfer_result = transfer(to_account_identifier, amount).await;
-
-    match transfer_result {
-        Ok(_) => Ok(true),
-        Err(e) => Err(e),
-    }
+    transfer(to_account_identifier, amount).await
 }
 
 // account id - 13f313beb13d449568ac98eb989f74b61463f7c4edb69be1b8b5d1e1044fe71a
+// lh5he-yaatz-u5hrt-ys5ti-kqi74-jhkum-dxahj-c6ijw-2uans-wgznx-jae
 
 // ledger_id = bkyz2-fmaaa-aaaaa-qaaaq-cai
 // wallet_id =
 
 // efault account id - 04208a95eb03b4d668859e0fc62c98cf059c0db0c1cffbe62ed5c0f3e942ff6a
+// ms725-4x546-spyjs-zqu7o-4ghiv-zh6zj-gnk3s-oects-u5qhl-en7so-gqe
+
+//2
+// address-account= 3f5cf65eb23170fdcf47bbcac7382cf95471d74b2c79a055260fc855765a4676
+
 #[cfg(test)]
 mod tests {
     use env::TestEnvironment;

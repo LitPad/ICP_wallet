@@ -17,6 +17,25 @@ type Transaction =
     created_at: nat64;
 };
 
+type TransferRequest = record {
+  to: text;      // Target account identifier
+  amount: nat64; // Amount in e8s (1 ICP = 10^8 e8s)
+};
+
+type BalanceRequest = record {
+  account: text; // Account identifier
+};
+
+type TransferResponse = record {
+  block_index: opt nat64; // Ledger block index for the transfer
+  error: opt text;        // Error message, if any
+};
+
+type BalanceResponse = record {
+  balance: nat64; // Balance in e8s
+  error: opt text; // Error message, if any
+};
+
 service: {
     create_wallet: (text) -> (Wallet);
     fund_wallet: (text, nat64) -> (nat64, Transaction);
@@ -27,6 +46,6 @@ service: {
     get_wallet: (text) -> (vec Wallet) query;
 
     // Interacting with the ICP itself
-    check_icp_balance: (text) -> (nat64);
-    transfer_icp: (text, text, nat64) -> (bool);
+    check_icp_balance: (text) -> (BalanceResponse) query;
+    transfer_icp: (text, text, nat64) -> (TransferResponse);
 }
